@@ -25,8 +25,9 @@ class ShowsController < ApplicationController
 
     respond_to do |format|
       if @show.save
-        format.html { redirect_to @show, notice: "Show was successfully created." }
-        format.json { render :show, status: :created, location: @show }
+        redirect_to movie_path(@movie), notice: "Show created successfully!"
+        # format.html { redirect_to @show, notice: "Show was successfully created." }
+        # format.json { render :show, status: :created, location: @show }
       else
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @show.errors, status: :unprocessable_entity }

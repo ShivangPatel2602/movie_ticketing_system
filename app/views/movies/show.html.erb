@@ -1,10 +1,17 @@
-<p style="color: green"><%= notice %></p>
+<h1><%= @movie.title %></h1>
+<p>Genre: <%= @movie.genre %></p>
+<p>Duration: <%= @movie.duration %> minutes</p>
+<p>Language: <%= @movie.language %></p>
+<p>Rating: <%= @movie.rating %></p>
+<p>Release Date: <%= @movie.release_date %></p>
 
-<%= render @movie %>
-
-<div>
-  <%= link_to "Edit this movie", edit_movie_path(@movie) %> |
-  <%= link_to "Back to movies", movies_path %>
-
-  <%= button_to "Destroy this movie", @movie, method: :delete %>
-</div>
+<h2>Shows</h2>
+<%= link_to "Add Show", new_movie_show_path(movie_id: @movie.id) %>
+<ul>
+  <% @movie.shows.each do |show| %>
+    <li>
+      Date: <%= show.date %>, Time: <%= show.time %>, Price: $<%= show.ticket_price %>
+      (<%= link_to "View", show_path(show) %>)
+    </li>
+  <% end %>
+</ul>
