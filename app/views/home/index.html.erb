@@ -3,8 +3,9 @@
 <% if current_admin %>
     Logged in as Admin <%= current_admin.name%>.<br>
     <%= link_to "Manage movies", movies_path %><br>
-    <%= link_to "Manage shows", shows_path %><br>
+    <%= link_to "Manage shows", movie_shows_path(Movie.order(created_at: :desc)) %><br>
     <%= link_to "Manage tickets", tickets_path %><br>
+    <%= link_to "Edit profile", edit_admin_path(current_admin.id) %><br>
     <%= link_to "Logout", admin_logout_path %><br>
 
 <% elsif current_user %>
