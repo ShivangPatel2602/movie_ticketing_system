@@ -59,6 +59,7 @@ class TicketsController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
+    # Test
     def set_ticket
       @ticket = Ticket.find(params.expect(:id))
     end
