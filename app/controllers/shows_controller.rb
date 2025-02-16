@@ -1,42 +1,23 @@
 class ShowsController < ApplicationController
-  before_action :set_show, only: %i[ show edit update destroy ]
-
-  # GET /shows or /shows.json
+  # Show all movies in the drop-down
   def index
-    @shows = Show.all
+    @movie = Movie.find_by(id: params[:movie_id])  # Safely finding the movie by ID
+    @shows = @movie.shows
   end
 
-  # GET /shows/1 or /shows/1.json
-  def show
-  end
-
-  # GET /shows/new
   def new
     @show = Show.new
+    @movies = Movie.all  # Fetch all movies
+    @selected_movie = Movie.find_by(id: params[:movie_id]) 
   end
 
-  # GET /shows/1/edit
-  def edit
+  def edit 
+    @show = Show.find(params[:id])
+    @movies = Movie.all
   end
 
-  # POST /shows or /shows.json
-  def create
-    @show = Show.new(show_params)
-
-    respond_to do |format|
-      if @show.save
-        redirect_to movie_path(@movie), notice: "Show created successfully!"
-        # format.html { redirect_to @show, notice: "Show was successfully created." }
-        # format.json { render :show, status: :created, location: @show }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @show.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # PATCH/PUT /shows/1 or /shows/1.json
   def update
+    @show = Show.find(params[:id])
     respond_to do |format|
       if @show.update(show_params)
         format.html { redirect_to @show, notice: "Show was successfully updated." }
@@ -48,24 +29,44 @@ class ShowsController < ApplicationController
     end
   end
 
-  # DELETE /shows/1 or /shows/1.json
+  # Create a new show and associate it with the selected movie
+  def create
+    @show = Show.new(show_params)
+    @movie = Movie.find_by(id: params[:show][:movie_id])  # Find the movie by ID
+    @show.available_seats = @show.seats
+    if @movie
+      @show.movie = @movie  # Associate the show with the selected movie
+      respond_to do |format|
+        if @show.save
+          format.html { redirect_to @show, notice: "Show was successfully created." }
+          format.json { render :show, status: :created, location: @show }
+        else
+          format.html { render :new, status: :unprocessable_entity }
+          format.json { render json: @show.errors, status: :unprocessable_entity }
+        end
+      end
+    end  
+  end
+
+  def show
+    @show = Show.find(params[:id])
+  end
+
   def destroy
+    @show = Show.find(params[:id])
+    @movie = @show.movie
+    @show.tickets.destroy_all
     @show.destroy!
 
     respond_to do |format|
-      format.html { redirect_to shows_path, status: :see_other, notice: "Show was successfully destroyed." }
+      format.html { redirect_to movie_shows_path(@movie), status: :see_other, notice: "Show was successfully destroyed." }
       format.json { head :no_content }
     end
   end
-
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_show
-      @show = Show.find(params.expect(:id))
-    end
 
-    # Only allow a list of trusted parameters through.
-    def show_params
-      params.expect(show: [ :movie_id, :date, :time, :seats, :price ])
-    end
+  # Strong params to handle show fields
+  def show_params
+    params.require(:show).permit( :movie_id, :date, :time, :seats, :price, :available_seats)
+  end
 end

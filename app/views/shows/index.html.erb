@@ -9,6 +9,9 @@
     <%= render show %>
     <p>
       <%= link_to "Show this show", show %>
+      <% if current_user %>
+      <%= link_to "Purchase Tickets", new_movie_show_ticket_path(@movie, show)%>
+      <% end %>
     </p>
   <% end %>
 </div>
@@ -18,3 +21,4 @@
 <% end %>
 
 <%= link_to "Back to Main Menu", root_path %>
+<%= link_to "Back to Movies", movies_path %>

@@ -1,19 +1,15 @@
-<h1>New Show</h1>
-<%= form_with model: @show, url: movie_shows_path(@movie), local: true do |f| %>
-  <%= f.label :movie_id %>
-  <%= f.collection_select :movie_id, Movie.all, :id, :title %>
+<% content_for :title, "New show" %>
 
-  <%= f.label :date %>
-  <%= f.date_select :date %>
+<h1>New show</h1>
 
-  <%= f.label :time %>
-  <%= f.time_select :time %>
+<%= render "form", show: @show %>
 
-  <%= f.label :available_seats %>
-  <%= f.number_field :available_seats %>
+<br>
 
-  <%= f.label :ticket_price %>
-  <%= f.number_field :ticket_price %>
-
-  <%= f.submit "Create Show" %>
+<% if current_user %>
+<%= link_to 'Buy Tickets', new_show_ticket_path(@show) %>
 <% end %>
+
+<div>
+  <%= link_to "Back to movies", movies_path %>
+</div>
