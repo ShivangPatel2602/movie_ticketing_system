@@ -38,7 +38,7 @@ class AdminsController < ApplicationController
   def update
     respond_to do |format|
       if @admin.update(admin_params)
-        format.html { redirect_to root_url, notice: "Admin was successfully updated." }
+        format.html { redirect_to @admin, notice: "Admin was successfully updated." }
         format.json { render :show, status: :ok, location: @admin }
       else
         format.html { render :edit, status: :unprocessable_entity }
@@ -60,13 +60,11 @@ class AdminsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_admin
-      # @admin = Admin.find(params.expect(:email))
-      @admin = Admin.find(params[:id])
+      @admin = Admin.find(params.expect(:email))
     end
 
     # Only allow a list of trusted parameters through.
     def admin_params
-      # params.expect(admin: [ :username, :name, :email, :password ])
-      params.require(:admin).permit(:name, :email)
+      params.expect(admin: [ :username, :name, :email, :password ])
     end
 end
