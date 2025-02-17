@@ -56,7 +56,12 @@ class UsersController < ApplicationController
   def destroy
     @user.destroy
     respond_to do |format|
-      format.html { redirect_to users_url, status: :see_other, notice: "User was successfully destroyed." }
+      if @user == current_user
+        reset_session
+        format.html { redirect_to root_path, notice: "Your account was successfully deleted and you have been logged out." }
+      else
+        format.html { redirect_to users_url, status: :see_other, notice: "User was successfully destroyed." }
+      end
       format.json { head :no_content }
     end
   end
@@ -76,7 +81,7 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:name, :email, :password, :phone_number, :address, :card_number, :expirate_date, :cvv)
+      params.require(:user).permit(:username, :name, :email, :password, :phone_number, :address, :card_number, :expirate_date, :cvv)
       # Note: :username is not included here, so it cannot be updated
     end
 end
