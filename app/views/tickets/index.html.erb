@@ -1,6 +1,9 @@
 <% content_for :title, "All Tickets" %>
 
 <!-- app/views/tickets/index.html.erb -->
+<% if flash[:alert] %>
+  <p class="flash flash=alert"><%= flash[:alert] %></p>
+<% end %>
 
 <h1>All Tickets</h1>
 
@@ -33,7 +36,11 @@
   </tbody>
 </table>
 
-<%= link_to 'New Ticket', new_ticket_path %>
+<% if current_user %>
+  <% if @tickets.any? %>
+    <%= link_to 'New Ticket', new_ticket_path(show_id: @tickets.first.show.id, user_id: current_user.id, price: @tickets.first.show.price) %>
+  <% end %>
+<% end %>
 
 
 <%= link_to "Back to Main Menu", root_path %>

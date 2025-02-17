@@ -3,9 +3,18 @@ class TicketsController < ApplicationController
 
   # GET /tickets or /tickets.json
   def index
-    @shows = Show.find_by(id: params[:show_id])
-    @tickets= @shows.tickets
-    @movie = @shows.movie
+    if current_admin  # Assuming there's an admin boolean flag on the User model
+      @tickets = Ticket.all
+    else
+      @tickets = current_user.tickets
+    end
+    # if (params[:show_id])
+    #   @shows = Show.find_by(id: params[:show_id])
+    #   @tickets= @shows.tickets
+    #   @movie = @shows.movie
+    # else
+    #   @tickets = Ticket.all
+    # end
   end
 
   # GET /tickets/1 or /tickets/1.json
@@ -15,7 +24,10 @@ class TicketsController < ApplicationController
   # GET /tickets/new
   def new
     @ticket = Ticket.new
-    @show = Show.find(params[:show_id])
+    if (params[:show_id])
+      @user = current_user
+      @show = Show.find(params[:show_id])
+    end
   end
 
   # GET /tickets/1/edit
@@ -30,24 +42,26 @@ class TicketsController < ApplicationController
   def create
     @ticket = Ticket.new(ticket_params)
     @ticket.confirmation_number=generate_confirmation_number
-
-    
     @show = Show.find_by(id: @ticket.show_id)  # Find the corresponding show
-    puts "#{@show.available_seats}"
-    puts "#{@ticket.number_of_tickets}"
+
+    # ticket_price = @show.price
+    # total_price = @ticket.number_of_tickets * ticket_price
     if @show.available_seats >= @ticket.number_of_tickets
       @ticket.show.available_seats -= @ticket.number_of_tickets  # Deduct available seats
       @ticket.show.save  # Save the updated show
 
       respond_to do |format|
         if @ticket.save
-          format.html { redirect_to movie_show_tickets_path(@show.movie, @show, @ticket), notice: "Ticket successfully purchased." }
+          format.html { redirect_to tickets_path, notice: "Ticket successfully purchased." }
           format.json { render :show, status: :created, location: @ticket }
         else
           format.html { render :new, status: :unprocessable_entity }
           format.json { render json: @ticket.errors, status: :unprocessable_entity }
         end
       end
+    else
+      flash[:alert] = "Not enough seats available to purchase the required number of tickets. Available seats: #{@ticket.show.available_seats}"
+      redirect_to tickets_path
     end
   end
 
@@ -94,8 +108,8 @@ class TicketsController < ApplicationController
   # DELETE /tickets/1 or /tickets/1.json
   def destroy
     #@movie = Movie.find(params[:movie_id])  # Find the movie by ID
-    @show = Show.find_by(id: params[:show_id])  # Find the show by show_id
-    @ticket = @show.tickets.find(params[:id])  # Find the ticket by ID within the show
+    @ticket = Ticket.find(params[:id])
+    @show = @ticket.show
   
     respond_to do |format|
       # Before destroying the ticket, adjust the available seats
