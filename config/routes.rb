@@ -1,14 +1,14 @@
 Rails.application.routes.draw do
   resources :tickets
   resources :shows do
-    resources :tickets, only: [:new, :create]  # or include other actions as needed
+    resources :tickets, only: [:new, :create, :destroy]  # or include other actions as needed
   end
   resources :movies do
     resources :shows do
       resources :tickets, only: [:new, :create, :index]
     end
   end
-  resources :admins, only: [:edit, :update]
+  resources :admins, only: [:edit, :update, :index]
   root 'home#index'
   resources :users
   resources :admin_sessions, only: [:new, :create, :destroy]
